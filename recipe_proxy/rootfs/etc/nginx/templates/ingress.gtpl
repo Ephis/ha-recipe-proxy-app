@@ -47,16 +47,17 @@ server {
         sub_filter 'http://192.168.0.175:5000/' '{{ .entry }}/';
         sub_filter 'http://192.168.0.175:4200/' '{{ .entry }}/';
 
-        # Rewrite absolute URLs in JavaScript code (common Angular patterns)
-        sub_filter '"/version.json"' '"{{ .entry }}/version.json"';
-        sub_filter "'/version.json'" "'{{ .entry }}/version.json'";
-        sub_filter '"/assets/' '"{{ .entry }}/assets/';
-        sub_filter "'/assets/" "'{{ .entry }}/assets/";
-        sub_filter '"/api/' '"{{ .entry }}/api/';
-        sub_filter "'/api/" "'{{ .entry }}/api/";
-        sub_filter '`/api/' '`{{ .entry }}/api/';
-        sub_filter '`/assets/' '`{{ .entry }}/assets/';
-        sub_filter '`/version.json' '`{{ .entry }}/version.json';
+        # Rewrite absolute URLs to relative URLs in JavaScript (base href will resolve them)
+        # This prevents double ingress path when Angular HTTP client uses base href
+        sub_filter '"/version.json"' '"version.json"';
+        sub_filter "'/version.json'" "'version.json'";
+        sub_filter '"/assets/' '"assets/';
+        sub_filter "'/assets/" "'assets/";
+        sub_filter '"/api/' '"api/';
+        sub_filter "'/api/" "'api/";
+        sub_filter '`/api/' '`api/';
+        sub_filter '`/assets/' '`assets/';
+        sub_filter '`/version.json' '`version.json';
 
         include /etc/nginx/includes/proxy_params.conf;
     }
