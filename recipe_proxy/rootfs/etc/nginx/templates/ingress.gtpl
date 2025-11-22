@@ -23,15 +23,16 @@ server {
         # Disable compression so sub_filter works
         proxy_set_header Accept-Encoding "";
 
-        # Rewrite absolute paths in responses to include ingress path
+        # Rewrite absolute paths in responses
+        sub_filter_types text/html text/css text/javascript application/javascript;
         sub_filter 'href="/' 'href="{{ .entry }}/';
         sub_filter 'src="/' 'src="{{ .entry }}/';
-        sub_filter 'action="/' 'action="{{ .entry }}/';
         sub_filter "href='/" "href='{{ .entry }}/";
         sub_filter "src='/" "src='{{ .entry }}/";
-        sub_filter "action='/" "action='{{ .entry }}/";
+        sub_filter 'url(/' 'url({{ .entry }}/';
+        sub_filter "url('/" "url('{{ .entry }}/";
+        sub_filter 'url("/' 'url("{{ .entry }}/';
         sub_filter_once off;
-        sub_filter_types *;
 
         include /etc/nginx/includes/proxy_params.conf;
     }
