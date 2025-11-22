@@ -14,6 +14,11 @@ server=$(bashio::config 'server')
 proxy_pass_host=^$(bashio::config 'proxy_pass_host')
 proxy_pass_real_ip=^$(bashio::config 'proxy_pass_real_ip')
 
+bashio::log.info "Ingress entry: ${entry}"
+bashio::log.info "Backend server: ${server}"
+bashio::log.info "Proxy pass host: ${proxy_pass_host}"
+bashio::log.info "Proxy pass real IP: ${proxy_pass_real_ip}"
+
 bashio::var.json \
     entry "${entry}" \
     server "${server}" \
@@ -22,3 +27,6 @@ bashio::var.json \
     | tempio \
         -template /etc/nginx/templates/ingress.gtpl \
         -out /etc/nginx/servers/ingress.conf
+
+bashio::log.info "Generated nginx configuration:"
+cat /etc/nginx/servers/ingress.conf
