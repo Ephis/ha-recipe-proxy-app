@@ -20,18 +20,37 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         {{ end }}
 
-        # Disable compression so sub_filter works
+        # Disable compression so rewriting works
         proxy_set_header Accept-Encoding "";
 
-        # Rewrite absolute paths in responses to include ingress path
-        sub_filter 'href="/' 'href="{{ .entry }}/';
-        sub_filter 'src="/' 'src="{{ .entry }}/';
-        sub_filter 'action="/' 'action="{{ .entry }}/';
-        sub_filter "href='/" "href='{{ .entry }}/";
-        sub_filter "src='/" "src='{{ .entry }}/";
-        sub_filter "action='/" "action='{{ .entry }}/";
-        sub_filter_once off;
-        sub_filter_types *;
+        # Use Lua to rewrite HTML responses with base tag
+        header_filter_by_lua_block {
+            local content_type = ngx.header["Content-Type"]
+            if content_type and string.find(content_type, "text/html") then
+                ngx.header.content_length = nil
+            end
+        }
+
+        body_filter_by_lua_block {
+            local content_type = ngx.header["Content-Type"]
+            if content_type and string.find(content_type, "text/html") then
+                local ingress_path = "{{ .entry }}"
+                local chunk = ngx.arg[1]
+                if chunk then
+                    -- Inject base tag after <head>
+                    chunk = string.gsub(chunk, "<head>", '<head><base href="' .. ingress_path .. '/">')
+                    chunk = string.gsub(chunk, "<HEAD>", '<HEAD><base href="' .. ingress_path .. '/">')
+
+                    -- Also rewrite absolute paths just in case
+                    chunk = string.gsub(chunk, 'src="/', 'src="' .. ingress_path .. '/')
+                    chunk = string.gsub(chunk, 'href="/', 'href="' .. ingress_path .. '/')
+                    chunk = string.gsub(chunk, "src='/", "src='" .. ingress_path .. "/")
+                    chunk = string.gsub(chunk, "href='/", "href='" .. ingress_path .. "/")
+
+                    ngx.arg[1] = chunk
+                end
+            end
+        }
 
         include /etc/nginx/includes/proxy_params.conf;
     }
