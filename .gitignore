@@ -1,0 +1,12 @@
+# Development
+.vscode/
+.devcontainer/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+*.swp
+*.swo
+*~

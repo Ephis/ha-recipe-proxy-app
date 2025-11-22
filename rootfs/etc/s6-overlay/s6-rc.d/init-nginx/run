@@ -1,0 +1,24 @@
+#!/command/with-contenv bashio
+# shellcheck shell=bash
+# ==============================================================================
+# Init nginx by processing templates
+# ==============================================================================
+
+declare entry
+declare server
+declare proxy_pass_host
+
+entry=$(bashio::addon.ingress_entry)
+server=$(bashio::config 'server')
+# The caret stops bashio:var.json from passing the value as a string
+proxy_pass_host=^$(bashio::config 'proxy_pass_host')
+proxy_pass_real_ip=^$(bashio::config 'proxy_pass_real_ip')
+
+bashio::var.json \
+    entry "${entry}" \
+    server "${server}" \
+    proxy_pass_host "${proxy_pass_host}" \
+    proxy_pass_real_ip "${proxy_pass_real_ip}" \
+    | tempio \
+        -template /etc/nginx/templates/ingress.gtpl \
+        -out /etc/nginx/servers/ingress.conf
