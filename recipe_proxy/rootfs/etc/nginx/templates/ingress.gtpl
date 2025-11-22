@@ -29,7 +29,7 @@ server {
         proxy_buffers 8 128k;
 
         # Use sub_filter to rewrite paths (built into nginx core)
-        sub_filter_types text/html;
+        sub_filter_types text/html application/javascript text/javascript;
         sub_filter_once off;
         sub_filter_last_modified off;
 
@@ -42,6 +42,10 @@ server {
         sub_filter 'href="/' 'href="{{ .entry }}/';
         sub_filter "src='/" "src='{{ .entry }}/";
         sub_filter "href='/" "href='{{ .entry }}/";
+
+        # Rewrite hardcoded backend URLs in HTML/JS to use relative paths
+        sub_filter 'http://192.168.0.175:5000/' '/';
+        sub_filter 'http://192.168.0.175:4200/' '/';
 
         include /etc/nginx/includes/proxy_params.conf;
     }
