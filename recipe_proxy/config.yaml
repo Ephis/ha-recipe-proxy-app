@@ -17,6 +17,7 @@ boot: auto
 hassio_api: true
 ingress: true
 ingress_port: 5000
+panel_iframe: true
 panel_icon: mdi:food
 panel_title: Recipes
 options:
