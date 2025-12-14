@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2025-12-14
+
+### Changed
+- Removed redundant panel_iframe setting for cleaner ingress integration
+
 ## [1.0.0] - 2025-11-22
 
 ### Added

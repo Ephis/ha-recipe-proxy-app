@@ -33,6 +33,16 @@ This option determines whether to forward the client's real IP address to your r
 
 Set this to `false` if your recipe application restricts access based on specific IP addresses through an upstream proxy.
 
+## Fullscreen Mode (Hiding Home Assistant Header)
+
+By default, the add-on displays within Home Assistant's interface, which includes the sidebar and header navigation. If you want a fullscreen experience without the Home Assistant header, you have the following options:
+
+1. **Kiosk Mode HACS Integration** - Install the [kiosk-mode](https://github.com/NemesisRE/kiosk-mode) integration from HACS to hide the header and sidebar for specific users or panels.
+
+2. **Browser Kiosk Mode** - Access Home Assistant in your browser's kiosk or fullscreen mode (F11 in most browsers).
+
+3. **Direct Access** - If your recipe application is accessible on your network, you can access it directly without going through Home Assistant's ingress.
+
 ## Requirements
 
 - Your recipe application must be running and accessible on your network
