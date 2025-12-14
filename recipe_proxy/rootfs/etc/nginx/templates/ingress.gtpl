@@ -92,6 +92,13 @@ server {
         sub_filter '`/assets/' '`assets/';
         sub_filter '`/version.json' '`version.json';
 
+        # Rewrite absolute backend/frontend server URLs to ingress path
+        # This fixes Mixed Content errors when frontend contains hardcoded URLs
+        sub_filter '{{ .backend_server }}/' '{{ .entry }}/';
+        sub_filter '{{ .backend_server }}' '{{ .entry }}';
+        sub_filter '{{ .frontend_server }}/' '{{ .entry }}/';
+        sub_filter '{{ .frontend_server }}' '{{ .entry }}';
+
         include /etc/nginx/includes/proxy_params.conf;
     }
 }
