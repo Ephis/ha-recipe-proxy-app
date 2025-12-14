@@ -1,5 +1,5 @@
 name: Recipe Proxy
-version: "1.0.2"
+version: "1.0.3"
 slug: recipe-proxy
 description: Proxy to a local recipe application
 url: https://github.com/Ephis/ha-recipe-proxy-app
@@ -17,7 +17,6 @@ boot: auto
 hassio_api: true
 ingress: true
 ingress_port: 5000
-panel_iframe: true
 panel_icon: mdi:food
 panel_title: Recipes
 options:
