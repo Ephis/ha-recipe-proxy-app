@@ -7,7 +7,13 @@ server {
     deny    all;
 
     # Proxy API requests to backend server
-    location /api/ {
+    # Use regex location to handle doubled ingress path issue
+    location ~ ^/api/ {
+        # Fix doubled ingress path: if URI starts with ingress entry, strip it
+        # This happens when frontend constructs URLs with base path and interceptor prepends again
+        # E.g., /api/hassio_ingress/TOKEN/api/units -> /api/units
+        rewrite ^{{ .entry }}(/api/.*)$ $1 break;
+
         # Proxy to backend API server
         proxy_pass {{ .backend_server }};
 
@@ -29,15 +35,17 @@ server {
         proxy_buffer_size 128k;
         proxy_buffers 8 128k;
 
-        # Rewrite absolute backend URLs in JSON responses to use ingress path
+        # Rewrite absolute backend URLs in JSON responses to use relative paths
+        # Using relative URLs prevents doubled ingress path when frontend HTTP interceptor prepends base URL
         sub_filter_types application/json;
         sub_filter_once off;
         sub_filter_last_modified off;
 
-        # Replace absolute backend URLs with ingress-relative URLs
-        # This fixes Mixed Content errors when accessing via HTTPS ingress
-        sub_filter '{{ .backend_server }}/' '{{ .entry }}/';
-        sub_filter '{{ .backend_server }}' '{{ .entry }}';
+        # Replace absolute backend URLs with relative URLs (remove server prefix entirely)
+        # Frontend base href or HTTP interceptor will resolve these correctly
+        sub_filter '{{ .backend_server }}/api/' 'api/';
+        sub_filter '{{ .backend_server }}/' '/';
+        sub_filter '{{ .backend_server }}' '';
 
         include /etc/nginx/includes/proxy_params.conf;
     }
